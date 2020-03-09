@@ -138,7 +138,11 @@ target_link_libraries(${CMAKE_PROJECT_NAME}.elf ${BOR_LDFLAGS})
 if (BUILD_PSP2)
     vita_create_self(${CMAKE_PROJECT_NAME}.self ${CMAKE_PROJECT_NAME}.elf)
     vita_create_vpk(${CMAKE_PROJECT_NAME}.vpk "OPENBOR01" ${CMAKE_PROJECT_NAME}.self
-            VERSION "01.00" NAME "${CMAKE_PROJECT_NAME}")
+            VERSION "01.00" NAME "${CMAKE_PROJECT_NAME}"
+            FILE ${CMAKE_SOURCE_DIR}/engine/resources/psp2data/sce_sys/icon0.png sce_sys/icon0.png
+            FILE ${CMAKE_SOURCE_DIR}/engine/resources/psp2data/sce_sys/livearea/contents/bg.png sce_sys/livearea/contents/bg.png
+            FILE ${CMAKE_SOURCE_DIR}/engine/resources/psp2data/sce_sys/livearea/contents/startup.png sce_sys/livearea/contents/startup.png
+            FILE ${CMAKE_SOURCE_DIR}/engine/resources/psp2data/sce_sys/livearea/contents/template.xml sce_sys/livearea/contents/template.xml)
 endif (BUILD_PSP2)
 
 #####################
