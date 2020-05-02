@@ -130,5 +130,6 @@ endif (BUILD_PSP2)
 if (BUILD_NX)
     add_custom_target(${CMAKE_PROJECT_NAME}.nro
             DEPENDS ${CMAKE_PROJECT_NAME}.elf
-            COMMAND elf2nro ${CMAKE_PROJECT_NAME}.elf ${CMAKE_PROJECT_NAME}.nro)
+            COMMAND ${DEVKITPRO}/tools/bin/nacptool --create "${CMAKE_PROJECT_NAME}" "cpasjuste, rsn8887" "1.1" ${CMAKE_PROJECT_NAME}.nacp
+            COMMAND elf2nro ${CMAKE_PROJECT_NAME}.elf ${CMAKE_PROJECT_NAME}.nro --icon=${CMAKE_SOURCE_DIR}/engine/resources/switch_icon.jpg --nacp=${CMAKE_PROJECT_NAME}.nacp)
 endif (BUILD_NX)

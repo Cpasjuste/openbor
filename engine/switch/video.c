@@ -13,9 +13,7 @@
 #include "savedata.h"
 #include "gfx.h"
 #include "videocommon.h"
-
-#define SCREEN_W 1280
-#define SCREEN_H 720
+#include <switch.h>
 
 SDL_Window *window = NULL;
 
@@ -33,6 +31,12 @@ static unsigned pixelformats[4] = {SDL_PIXELFORMAT_INDEX8,
                                    SDL_PIXELFORMAT_BGR565,
                                    SDL_PIXELFORMAT_BGR888,
                                    SDL_PIXELFORMAT_ABGR8888};
+
+static int display_width = 1280;
+static int display_height = 720;
+static int currently_docked = -1; // -1 means not yet determined
+static int isDocked(); // determine if we are docked or not
+static void updateResolution(); // updates resolution if docked mode changed
 
 void initSDL(int w, int h) {
 
@@ -73,8 +77,8 @@ int SetVideoMode(int w, int h, int bpp, bool gl) {
         SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
         SDL_DisplayMode mode;
         SDL_GetDisplayMode(0, 0, &mode);
-        mode.w = w > SCREEN_W ? SCREEN_W : w;
-        mode.h = h > SCREEN_H ? SCREEN_H : h;
+        mode.w = w > display_width ? display_width : w;
+        mode.h = h > display_height ? display_height : h;
         SDL_SetWindowDisplayMode(window, &mode);
     } else {
         SDL_SetWindowFullscreen(window, 0);
@@ -138,8 +142,46 @@ void video_clearscreen() {
     SDL_RenderPresent(renderer);
 }
 
+int isDocked() {
+    switch (appletGetOperationMode()) {
+        case AppletOperationMode_Handheld:
+            return 0;
+            break;
+        case AppletOperationMode_Docked:
+            return 1;
+            break;
+        default:
+            return 0;
+    }
+}
+
+void updateResolution() {
+    int docked = isDocked();
+    if ((docked && !currently_docked) || (!docked && currently_docked) || currently_docked == -1) {
+        // docked mode has changed, update window size etc.
+        if (docked) {
+            display_width = 1920;
+            display_height = 1080;
+            currently_docked = 1;
+        } else {
+            display_width = 1280;
+            display_height = 720;
+            currently_docked = 0;
+        }
+        // remove leftover-garbage on screen
+        SDL_RenderClear(renderer);
+        SDL_RenderPresent(renderer);
+        SDL_RenderClear(renderer);
+        SDL_RenderPresent(renderer);
+        SDL_RenderClear(renderer);
+        SDL_RenderPresent(renderer);
+        SDL_SetWindowSize(window, display_width, display_height);
+    }
+}
+
 void blit() {
 
+    updateResolution(); // update resolution if dock mode has changed
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, texture, NULL, NULL);
@@ -170,8 +212,6 @@ void video_stretch(int enable) {
     printf("video_stretch: %i (%ix%i)\n",
            enable, stored_videomodes.hRes, stored_videomodes.vRes);
 
-    // TODO ?
-    /*
     stretch = enable;
     if (window) {
         if (stretch)
@@ -180,7 +220,6 @@ void video_stretch(int enable) {
             SDL_RenderSetLogicalSize(renderer, stored_videomodes.hRes, stored_videomodes.vRes);
         }
     }
-    */
 }
 
 void video_set_color_correction(int gm, int br) {

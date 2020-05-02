@@ -458,7 +458,11 @@ static void initMenu(int type)
 	videomodes.hScale = 2.0f;
 	videomodes.vScale = 2.0f;
 	savedata.hwscale = 2.0f;
+#ifdef __SWITCH__
+	savedata.hwfilter = 0;
+#else
 	savedata.hwfilter = 1;
+#endif
 #endif
 	vscreen = allocscreen(videomodes.hRes, videomodes.vRes, PIXEL_32);
 

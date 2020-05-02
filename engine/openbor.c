@@ -2994,13 +2994,21 @@ void clearsettings()
     savedata.logo = 0;
     savedata.uselog = 1;
     savedata.debuginfo = 0;
+#ifdef __SWITCH__
+    savedata.fullscreen = 1;
+    savedata.stretch = 1;
+#else
     savedata.fullscreen = 0;
     savedata.stretch = 0;
-
+#endif
 
 #ifdef SDL
     savedata.usegl = 1;
+#ifdef __SWITCH__
+    savedata.hwfilter = 0; // bilinear
+#else
     savedata.hwfilter = 1;
+#endif
 #ifdef ANDROID
     savedata.hwscale = 0.0;
 #else
